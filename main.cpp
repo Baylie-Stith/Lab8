@@ -2,23 +2,18 @@
 // String-based calculator
 //
 // Reads pairs of numbers from a file (one pair per line), checks that each
-// number is a valid decimal number, and adds them. Every number stays a
-// string the whole time: no stod/stoi/atof, no try/catch. Only single digits,
-// carries, borrows and indices are ever stored as ints.
+// number is a valid decimal number, and adds them.
 // ============================================================================
 
-#include <fstream>   // ifstream: reading the input file
-#include <iostream>  // cout, cin, cerr: console input/output
-#include <sstream>   // istringstream: splitting a line into tokens
-#include <string>    // string
-#include <vector>    // vector: holds the tokens found on a line
+#include <fstream>   
+#include <iostream>  
+#include <sstream>   
+#include <string>    
+#include <vector>    
 
 using namespace std;
 
-// ----------------------------------------------------------------------------
 // isDigit: true if c is one of the characters '0' through '9'.
-// Written by hand instead of using a library function.
-// ----------------------------------------------------------------------------
 static bool isDigit(char c) { return c >= '0' && c <= '9'; }
 
 // ----------------------------------------------------------------------------
@@ -28,23 +23,23 @@ static bool isDigit(char c) { return c >= '0' && c <= '9'; }
 bool isValidNumber(const string &s) {
     size_t i = 0, n = s.size();
 
-    // Step 1: skip one optional sign character.
+    // skip one optional sign character.
     if (i < n && (s[i] == '+' || s[i] == '-')) i++;
 
-    // Step 2: consume the integer part (the digits before any decimal point).
+    // consume the integer part (the digits before any decimal point).
     size_t start = i;
     while (i < n && isDigit(s[i])) i++;
-    if (i == start) return false;   // no digits at all (e.g. "A", "+", ".5", "+-1")
+    if (i == start) return false;   // no digits at all
 
-    // Step 3: if the string ends here it is a plain integer, which is valid.
+    // if the string ends here it is a plain integer, which is valid.
     if (i == n) return true;
 
-    // Step 4: anything left must be a '.' followed by digits.
-    // Anything else (e.g. 'e' in "1e3") makes the number invalid.
+    // anything left must be a '.' followed by digits.
+    // Anything else makes the number invalid.
     if (s[i] != '.') return false;
     i++;  // move past the '.'
 
-    // Step 5: consume the fractional digits.
+    // consume the fractional digits.
     size_t fracStart = i;
     while (i < n && isDigit(s[i])) i++;
 
@@ -66,9 +61,7 @@ struct Num {
     size_t scale;
 };
 
-// ----------------------------------------------------------------------------
 // parse: splits an already-validated string into sign, digits and scale.
-// ----------------------------------------------------------------------------
 Num parse(const string &s) {
     Num r{false, "", 0};
     size_t i = 0;
@@ -80,7 +73,7 @@ Num parse(const string &s) {
     }
 
     // Copy every digit; skip the '.', but remember we are past it so we can
-    // count how many digits come after it (that count is the scale).
+    // count how many digits come after it (the scale)
     bool inFrac = false;
     for (; i < s.size(); i++) {
         if (s[i] == '.') {
@@ -146,9 +139,7 @@ string subDigits(const string &a, const string &b) {
     return res;
 }
 
-// ----------------------------------------------------------------------------
 // addNumbers: adds two valid number strings and returns the sum as a string.
-// ----------------------------------------------------------------------------
 string addNumbers(const string &x, const string &y) {
     Num a = parse(x), b = parse(y);
 
@@ -202,8 +193,7 @@ string addNumbers(const string &x, const string &y) {
     string result = intPart;
     if (!fracPart.empty()) result += "." + fracPart;
 
-    // Add '-' only if negative and the value is not zero (so we never print
-    // "-0", e.g. for +123 + -123).
+    // Add '-' only if negative and the value is not zero (so we never print "-0"
     bool isZero = (intPart == "0" && fracPart.empty());
     if (neg && !isZero) result = "-" + result;
     return result;
